@@ -159,6 +159,7 @@ def ComputeGroupId(url, title, description):
         identifier = description
     else:
         identifier = urlparse(url).path
+
     seed = domain + '\0' + identifier
     groupid = hashlib.sha1(seed.encode('utf-8')).hexdigest()[:16]
     logging.error(groupid)
@@ -243,7 +244,6 @@ def GetContentEncoding(content):
     try:
         # Don't assume server return proper charset and always try UTF-8 first.
         u_value = unicode(content, 'utf-8')
-        logging.info('woooo')
         return 'utf-8'
     except UnicodeDecodeError:
         pass
@@ -258,17 +258,14 @@ def GetContentEncoding(content):
             _, params = cgi.parse_header(content_type)
             if 'charset' in params:
                 encoding = params['charset']
-                logging.info('1:' + encoding)
     if encoding is None:
         value = htmltree.xpath('//head//meta/attribute::charset')
         if (len(value) > 0):
             encoding = value[0]
-            logging.info('2:' + encoding)
 
     if encoding is None:
         encoding = 'iso-8859-1'
         u_value = unicode(content, 'iso-8859-1')
-    logging.info(encoding)
 
     return encoding
 
