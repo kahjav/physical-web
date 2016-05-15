@@ -153,16 +153,15 @@ def ComputeGroupId(url, title, description):
     import hashlib
     domain = urlparse(url).netloc
 
-    if title is not None:
-        identifier = title
-    elif description is not None:
-        identifier = description
-    else:
-        identifier = urlparse(url).path
+    # if title is not None:
+    #     identifier = title
+    # elif description is not None:
+    #     identifier = description
+    # else:
+    #     identifier = urlparse(url).path
 
-    seed = domain + '\0' + identifier
+    seed = domain + '\0' + title
     groupid = hashlib.sha1(seed.encode('utf-8')).hexdigest()[:16]
-    logging.error(groupid)
     return groupid
 
 ################################################################################
@@ -202,11 +201,9 @@ def FetchAndStoreUrl(siteInfo, url, distance=None, force_update=False):
         headers = {'User-Agent': PHYSICAL_WEB_USER_AGENT}
         if ENABLE_EXPERIMENTAL and distance is not None:
             headers['X-PhysicalWeb-Distance'] = distance
-
-        result = urlfetch.fetch(url,
-                                follow_redirects=False,
-                                validate_certificate=True,
-                                headers=headers)
+        logging.info(url)
+        result = urlfetch.fetch(url)
+        logging.info(result)
     except:
         logging.info('FetchAndStoreUrl FailedFetch url:{0}'.format(url))
         raise FailedFetchException()
@@ -290,7 +287,6 @@ def StoreUrl(siteInfo, url, content, encoding):
     icon = None
 
     # parse the content
-    logging.info(encoding)
     parser = lxml.etree.HTMLParser(encoding=encoding)
     htmltree = lxml.etree.fromstring(content, parser)
 
